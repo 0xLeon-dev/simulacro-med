@@ -1,5 +1,5 @@
 // Guarda la app en el celular para que abra rápido aunque la señal sea mala.
-const CACHE = "simulacro-v1";
+const CACHE = "simulacro-v2";
 const FILES = ["/", "/index.html", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", e => {

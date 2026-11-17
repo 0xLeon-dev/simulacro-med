@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Simulacro Med</title>
-<meta name="description" content="Sube tus apuntes y practica con preguntas tipo examen de medicina.">
+<meta name="description" content="Sube tus apuntes y la app te arma resumen, flashcards, quiz tipo examen, trampas y plan de estudio.">
 <meta name="theme-color" content="#1f6b5a">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon-192.png">
@@ -15,51 +15,72 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  --bg:#f3f5f4; --paper:#ffffff; --ink:#15211e; --muted:#5b6964; --line:#d9e0dd;
+  --bg:#f3f5f4; --paper:#ffffff; --ink:#15211e; --muted:#5b6964; --line:#d9e0dd; --chip:#e8eeec;
   --accent:#1f6b5a; --accent-ink:#ffffff; --accent-soft:#e3efeb;
-  --ok:#1d7a46; --ok-soft:#e2f3e8; --bad:#b4372b; --bad-soft:#fbe7e4;
+  --ok:#1d7a46; --ok-soft:#e2f3e8; --bad:#b4372b; --bad-soft:#fbe7e4; --warn:#a55a0b; --warn-soft:#fbf0e1;
   --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root{
-  --bg:#0f1513; --paper:#161e1b; --ink:#e4ece9; --muted:#93a39d; --line:#2a3632;
+@media (prefers-color-scheme: dark){:root:not([data-theme=light]){
+  --bg:#0f1513; --paper:#161e1b; --ink:#e4ece9; --muted:#93a39d; --line:#2a3632; --chip:#1f2a26;
   --accent:#5cc2a6; --accent-ink:#0b1311; --accent-soft:#1b2c27;
-  --ok:#5ccf8c; --ok-soft:#16281e; --bad:#f08273; --bad-soft:#2e1a17; color-scheme:dark}}
+  --ok:#5ccf8c; --ok-soft:#16281e; --bad:#f08273; --bad-soft:#2e1a17; --warn:#f0b35c; --warn-soft:#2e2414; color-scheme:dark}}
+:root[data-theme=dark]{
+  --bg:#0f1513; --paper:#161e1b; --ink:#e4ece9; --muted:#93a39d; --line:#2a3632; --chip:#1f2a26;
+  --accent:#5cc2a6; --accent-ink:#0b1311; --accent-soft:#1b2c27;
+  --ok:#5ccf8c; --ok-soft:#16281e; --bad:#f08273; --bad-soft:#2e1a17; --warn:#f0b35c; --warn-soft:#2e2414; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);-webkit-tap-highlight-color:transparent}
-.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:22px 48px;display:grid;gap:18px}
-header{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,8vw,40px);line-height:1;margin:2px 0 0}
-section.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:14px}
-h2{font-family:var(--display);font-weight:600;font-size:18px;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-top:16px}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.brand img{width:38px;height:38px;border-radius:10px;flex:0 0 auto}
+.brand div{min-width:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);display:block}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(20px,6vw,26px);line-height:1.05;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{background:var(--chip);border-radius:99px;padding:4px 11px;font-size:13px;font-family:var(--mono);white-space:nowrap}
+.packbar{display:flex;gap:8px;align-items:center;margin-top:12px}
+.packbar select{flex:1;min-width:0}
+nav{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:4px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;padding:8px 13px;font-weight:500;border-radius:10px}
+nav button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+main{padding-block:14px 60px;display:grid;gap:12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
+h2{font-family:var(--display);font-weight:600;font-size:19px;margin:0;text-wrap:balance}
+h3{font-size:15px;margin:0}
 label{font-weight:500;font-size:13px}
-input[type=text],textarea,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+input[type=text],input[type=search],textarea,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%;max-width:100%}
 textarea{min-height:170px;resize:vertical}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.tabs{display:flex;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px}
-.tabs button{flex:1;border:0;background:transparent;padding:8px}
-.tabs button[aria-selected=true]{background:var(--paper);box-shadow:0 1px 2px rgba(0,0,0,.08);color:var(--accent)}
+button{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:10px 14px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.ok{background:var(--ok-soft);border-color:var(--ok)}
+button.bad{background:var(--bad-soft);border-color:var(--bad)}
+button.small{padding:6px 10px;font-size:13px;font-weight:500}
+button.wide{width:100%}
+button:disabled{opacity:.55;cursor:default}
+.seg{display:flex;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px}
+.seg button{flex:1;border:0;background:transparent;padding:8px}
+.seg button[aria-selected=true]{background:var(--paper);box-shadow:0 1px 2px rgba(0,0,0,.08);color:var(--accent)}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:420px){.grid3{grid-template-columns:1fr 1fr}.grid3 .field:last-child{grid-column:1/-1}}
 .field{display:grid;gap:4px;min-width:0}
-button{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:12px 16px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
-button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-button.wide{width:100%}
-button:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
 .drop{border:1.5px dashed var(--line);border-radius:10px;padding:22px 14px;text-align:center;color:var(--muted);display:grid;gap:8px;justify-items:center}
 .drop strong{color:var(--ink)}
-.file-chip{font-family:var(--mono);font-size:13px;background:var(--accent-soft);color:var(--accent);padding:4px 10px;border-radius:99px;word-break:break-all}
-.hint{font-size:13px;color:var(--muted);margin:0}
+.chip{font-family:var(--mono);font-size:12px;background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:99px;word-break:break-word;display:inline-block}
+.hint,.muted{font-size:13px;color:var(--muted);margin:0}
 .status{font-family:var(--mono);font-size:13px;color:var(--muted);min-height:1.4em;margin:0}
 .status.err{color:var(--bad)}
 .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.tag{background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:99px}
-.bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar{height:6px;background:var(--chip);border-radius:6px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
 .q{font-size:17px;font-weight:500;margin:0}
 .opts{display:grid;gap:8px}
@@ -70,13 +91,35 @@ button:disabled{opacity:.55;cursor:default}
 .expl{border-left:3px solid var(--accent);padding:4px 0 4px 12px;margin:0}
 .expl strong{display:block;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
 .expl.ok strong{color:var(--ok)} .expl.no strong{color:var(--bad)}
-.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
 .score{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
-.list{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.list{display:grid;margin:0;padding:0;list-style:none}
 .list li{border-top:1px solid var(--line);padding-block:10px;font-size:14px}
 .list .r{color:var(--ok);font-weight:500}
-.hist button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;border:0;padding:10px 0;background:transparent;font-weight:500}
-.hist span:last-child{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+details.sec{border-top:1px solid var(--line);padding-top:10px}
+details.sec:first-of-type{border-top:0;padding-top:0}
+details.sec summary{cursor:pointer;font-weight:600;font-size:16px;list-style-position:outside}
+details.sec ul{margin:8px 0 2px;padding-left:20px}
+details.sec li{margin:6px 0}
+.flash{min-height:210px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:10px;cursor:pointer;font-size:19px;font-weight:500;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px;width:100%}
+.flash.back{background:var(--accent-soft);font-size:17px;font-weight:400}
+.trap{border-left:4px solid var(--warn);background:var(--warn-soft);border-radius:8px;padding:10px 12px;display:grid;gap:4px}
+.trap b{font-weight:600}
+.timer{font-family:var(--display);font-weight:800;font-size:72px;text-align:center;font-variant-numeric:tabular-nums;line-height:1;margin:6px 0}
+.check{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line)}
+.check:first-child{border-top:0}
+.check input{margin-top:4px;width:20px;height:20px;flex:0 0 auto;accent-color:var(--accent)}
+.check span{flex:1}
+.check .m{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.done{color:var(--muted);text-decoration:line-through}
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stat div{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.topic{display:grid;gap:4px}
+.week{display:flex;gap:6px;align-items:flex-end;height:90px}
+.week div{flex:1;display:grid;gap:4px;justify-items:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.week i{display:block;width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px}
+.empty{text-align:center;justify-items:center;padding:28px 16px}
 .spinner{width:18px;height:18px;border:2px solid var(--accent-soft);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:-4px;margin-right:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.bar i{transition:none}.spinner{animation:none}}
@@ -85,82 +128,163 @@ button:disabled{opacity:.55;cursor:default}
 <body>
 <div class="wrap">
   <header>
-    <div><span class="eyebrow">Repaso para exámenes de medicina</span><h1>Simulacro Med</h1></div>
-    <button id="install" hidden>Instalar app</button>
+    <div class="brand"><img src="/icon-192.png" alt=""><div><span class="eyebrow">Tu repaso de medicina</span><h1>Simulacro Med</h1></div></div>
+    <span class="pill" id="streak" title="Racha de días">🔥 0</span>
+    <button class="small" id="themeBtn" aria-label="Cambiar tema claro u oscuro">🌓</button>
+    <button class="small" id="install" hidden>Instalar</button>
   </header>
+  <div class="packbar" id="packbar" hidden>
+    <label for="packSel" class="hint">Materia</label>
+    <select id="packSel"></select>
+  </div>
+  <nav id="nav" aria-label="Secciones"></nav>
+  <main id="view"></main>
+</div>
+<input type="file" id="file" accept="image/*,application/pdf" hidden>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
 
-  <section class="panel" aria-labelledby="h-notes">
-    <h2 id="h-notes">Tus apuntes</h2>
-    <div class="tabs" role="tablist">
-      <button role="tab" id="tab-text" aria-selected="true">Pegar texto</button>
-      <button role="tab" id="tab-file" aria-selected="false">Foto o PDF</button>
+<script>
+/* ================= UTILIDADES ================= */
+const $ = id => document.getElementById(id);
+const L = "ABCDEFGH";
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+};
+function esc(s){ const d=document.createElement("div"); d.textContent=String(s ?? ""); return d.innerHTML; }
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+const hoy = () => new Date().toLocaleDateString("en-CA");
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+/* ================= ESTADO ================= */
+// packs: materias que subió el usuario. prog: avance por materia.
+let packs = store.get("sm.packs", []);
+let prog = store.get("sm.prog", {});
+let actualId = store.get("sm.actual", null);
+let tab = "apuntes";
+let mode = "text", fileData = null, generando = false;
+const pendienteQuiz = new Set();
+
+// Pasa los simulacros de la versión 1 a materias para no perderlos
+(function migrar(){
+  const viejos = store.get("hist", null);
+  if (!viejos || store.get("sm.migrado", false)) return;
+  for (const h of viejos) {
+    const nombres = [...new Set((h.preguntas||[]).map(q => q.tema || "General"))];
+    const temas = nombres.map((n,i) => ({ id:"t"+(i+1), nombre:n }));
+    packs.push({ id:h.id, titulo:h.titulo, creado:+h.id||Date.now(), temas, resumen:[], flashcards:[], trampas:[], plan:[], fuente:"",
+      quiz:(h.preguntas||[]).map(q => ({ ...q, tema: temas[nombres.indexOf(q.tema||"General")].id })) });
+  }
+  store.set("sm.migrado", true); guardar();
+})();
+
+function guardar(){
+  if (!store.set("sm.packs", packs)) toast("El celular no tiene espacio para guardar más. Borra alguna materia vieja.");
+  store.set("sm.prog", prog); store.set("sm.actual", actualId);
+}
+const pack = () => packs.find(p => p.id === actualId) || null;
+function P(){ // progreso de la materia actual
+  const p = pack(); if (!p) return null;
+  return prog[p.id] ||= { cards:{}, qs:{}, plan:{}, planDia:"" };
+}
+const nombreTema = (p, id) => (p.temas.find(t => t.id === id) || {}).nombre || "";
+function marcarDia(){ const d = store.get("sm.dias", []); if (d[d.length-1] !== hoy()) { d.push(hoy()); store.set("sm.dias", d.slice(-400)); } pintarRacha(); }
+function racha(){
+  const d = new Set(store.get("sm.dias", [])); let n = 0; const f = new Date();
+  if (!d.has(hoy())) f.setDate(f.getDate()-1);
+  while (d.has(f.toLocaleDateString("en-CA"))) { n++; f.setDate(f.getDate()-1); }
+  return n;
+}
+function pintarRacha(){ const n = racha(); $("streak").textContent = `🔥 ${n}`; $("streak").title = `Racha: ${n} ${n===1?"día":"días"} seguidos`; }
+function toast(t){ const s = document.querySelector(".status"); if (s) { s.className="status err"; s.textContent=t; } else alert(t); }
+
+/* ================= NAVEGACIÓN ================= */
+const TABS = [
+  ["apuntes","Apuntes"],["plan","Plan de hoy"],["foco","Foco"],["resumen","Resumen"],
+  ["flash","Flashcards"],["quiz","Quiz"],["progreso","Progreso"],["trampas","Trampas"]
+];
+function pintarNav(){
+  $("nav").innerHTML = TABS.map(([k,t]) => `<button data-t="${k}" class="${k===tab?"on":""}" ${k===tab?'aria-current="page"':""}>${t}</button>`).join("");
+  $("nav").querySelectorAll("button").forEach(b => b.onclick = () => ir(b.dataset.t));
+  const on = $("nav").querySelector(".on"); if (on) on.scrollIntoView({inline:"nearest", block:"nearest"});
+}
+function pintarPackbar(){
+  $("packbar").hidden = !packs.length;
+  $("packSel").innerHTML = packs.map(p => `<option value="${p.id}" ${p.id===actualId?"selected":""}>${esc(p.titulo)}</option>`).join("");
+}
+$("packSel").onchange = e => { actualId = e.target.value; guardar(); fc = null; qz = null; render(); };
+function ir(t){ tab = t; pintarNav(); render(); window.scrollTo({top:0}); }
+function render(){
+  pintarPackbar();
+  const V = { apuntes:vApuntes, plan:vPlan, foco:vFoco, resumen:vResumen, flash:vFlash, quiz:vQuiz, progreso:vProgreso, trampas:vTrampas }[tab];
+  if (tab !== "apuntes" && tab !== "foco" && !pack()) return vVacio();
+  V();
+}
+function vVacio(){
+  $("view").innerHTML = `<section class="card empty"><h2>Todavía no hay material</h2>
+    <p class="muted">Sube tus apuntes, una foto o un PDF del tema y la app arma el resumen, las flashcards, el quiz, las trampas y tu plan de hoy.</p>
+    <button class="primary" id="goUp">Subir apuntes</button></section>`;
+  $("goUp").onclick = () => ir("apuntes");
+}
+
+/* ================= APUNTES (crear material) ================= */
+function vApuntes(){
+  const p = pack();
+  $("view").innerHTML = `
+  <section class="card" aria-labelledby="h-up">
+    <h2 id="h-up">Nueva materia</h2>
+    <div class="seg" role="tablist">
+      <button role="tab" id="tab-text" aria-selected="${mode==="text"}">Pegar texto</button>
+      <button role="tab" id="tab-file" aria-selected="${mode==="file"}">Foto o PDF</button>
     </div>
-    <div id="pane-text"><textarea id="notes" aria-label="Apuntes" placeholder="Pega aquí el tema que quieres repasar…"></textarea></div>
-    <div id="pane-file" hidden>
-      <div class="drop">
-        <strong>Sube una foto de tu cuaderno o un PDF</strong>
-        <span class="hint">JPG, PNG o PDF de hasta 3 MB</span>
-        <input type="file" id="file" accept="image/*,application/pdf" hidden>
+    <div id="pane-text" ${mode!=="text"?"hidden":""}><textarea id="notes" aria-label="Apuntes" placeholder="Pega aquí el tema que quieres estudiar…"></textarea></div>
+    <div id="pane-file" ${mode!=="file"?"hidden":""}>
+      <div class="drop"><strong>Sube una foto de tus apuntes o un PDF</strong>
+        <span class="hint">PDF de hasta 3 MB. Si es un libro, sube solo las páginas del tema.</span>
         <button id="pick">Elegir archivo</button>
-        <span id="fileName" class="file-chip" hidden></span>
-      </div>
+        <span id="fileName" class="chip" ${fileData?"":"hidden"}>${esc(fileData?.name||"")}</span></div>
     </div>
     <div class="grid3">
       <div class="field"><label for="count">Preguntas</label>
-        <select id="count"><option>5</option><option selected>10</option><option>15</option></select></div>
+        <select id="count"><option>10</option><option selected>15</option><option>20</option></select></div>
       <div class="field"><label for="style">Tipo</label>
         <select id="style"><option value="mixto">Mixto</option><option value="caso">Casos clínicos</option><option value="directa">Directas</option></select></div>
       <div class="field"><label for="level">Dificultad</label>
         <select id="level"><option value="básica">Básica</option><option value="intermedia" selected>Intermedia</option><option value="alta">Alta</option></select></div>
     </div>
-    <div class="field" id="codeField"><label for="code">Código de acceso</label>
+    <div class="field"><label for="code">Código de acceso</label>
       <input type="text" id="code" autocomplete="off" autocapitalize="characters" placeholder="Si tienes uno, escríbelo aquí"></div>
-    <button class="primary wide" id="gen">Generar simulacro</button>
-    <p class="status" id="status" role="status"></p>
+    <button class="primary wide" id="gen" ${generando?"disabled":""}>Crear material de estudio</button>
+    <p class="status" id="status" role="status">${generando?'<span class="spinner"></span>Armando tu material… puede tardar hasta 1 minuto':""}</p>
   </section>
+  ${packs.length ? `<section class="card" aria-labelledby="h-mis">
+    <div class="row between"><h2 id="h-mis">Mis materias</h2><button class="small" id="imp">Importar</button></div>
+    <ul class="list">${packs.map(x => `<li class="row between"><button class="small" data-open="${x.id}" style="border:0;padding:0;background:none;text-align:left;font-weight:${x.id===actualId?600:500}">${esc(x.titulo)}</button>
+      <span class="row"><span class="muted">${x.flashcards.length} tarjetas · ${x.quiz.length} preg.</span>
+      <button class="small" data-exp="${x.id}" aria-label="Compartir ${esc(x.titulo)}">Compartir</button>
+      <button class="small" data-del="${x.id}" aria-label="Borrar ${esc(x.titulo)}">Borrar</button></span></li>`).join("")}</ul>
+    <p class="hint">Con «Compartir» mandas la materia a un amigo por WhatsApp; él la abre con «Importar» sin gastar su límite.</p>
+  </section>` : `<section class="card"><div class="row between"><p class="muted">¿Un amigo te pasó una materia?</p><button class="small" id="imp">Importar</button></div></section>`}`;
 
-  <section class="panel" id="quiz" aria-live="polite"></section>
-
-  <section class="panel" id="histPanel" hidden>
-    <h2>Mis simulacros</h2>
-    <div class="list hist" id="hist"></div>
-  </section>
-</div>
-
-<script>
-const SAMPLE_QUIZ = {titulo:"Ejemplo · Preeclampsia", preguntas:[
-  {tema:"Preeclampsia", pregunta:"Primigesta de 34 semanas con PA 165/112 mmHg, cefalea intensa y plaquetas de 85 000. ¿Qué fármaco se indica para prevenir convulsiones?",
-   opciones:["Diazepam","Sulfato de magnesio","Fenitoína","Labetalol"], correcta:1,
-   explicacion:"El sulfato de magnesio es el fármaco de elección para prevenir y tratar la eclampsia. El labetalol baja la presión pero no previene convulsiones."},
-  {tema:"Preeclampsia", pregunta:"Durante la infusión de sulfato de magnesio, ¿cuál es el primer signo clínico de toxicidad que se debe vigilar?",
-   opciones:["Taquicardia","Hiperreflexia","Pérdida del reflejo rotuliano","Poliuria"], correcta:2,
-   explicacion:"La abolición del reflejo rotuliano aparece antes que la depresión respiratoria. Si aparece, se suspende la infusión y se considera gluconato de calcio."},
-  {tema:"Preeclampsia", pregunta:"¿Cuál es el tratamiento definitivo de la preeclampsia?",
-   opciones:["Antihipertensivos orales","Reposo absoluto","Terminar el embarazo","Corticoides"], correcta:2,
-   explicacion:"La enfermedad depende de la placenta, así que solo se resuelve con el parto. Los corticoides se usan para la maduración pulmonar fetal."}
-]};
-
-const $ = id => document.getElementById(id);
-const L = "ABCDEFGH";
-const store = {
-  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-};
-let current = SAMPLE_QUIZ, idx = 0, picked = null, answers = [], mode = "text", fileData = null;
-
-$("notes").value = store.get("notes", "");
-$("code").value = store.get("code", "");
-$("notes").oninput = () => store.set("notes", $("notes").value);
-$("code").oninput = () => store.set("code", $("code").value);
-
-function setMode(m){
-  mode = m;
-  $("tab-text").setAttribute("aria-selected", m==="text"); $("tab-file").setAttribute("aria-selected", m==="file");
-  $("pane-text").hidden = m!=="text"; $("pane-file").hidden = m!=="file";
+  $("notes").value = store.get("notes", "");
+  $("code").value = store.get("code", "");
+  $("notes").oninput = () => store.set("notes", $("notes").value);
+  $("code").oninput = () => store.set("code", $("code").value);
+  $("tab-text").onclick = () => { mode="text"; vApuntes(); };
+  $("tab-file").onclick = () => { mode="file"; vApuntes(); };
+  $("pick").onclick = () => $("file").click();
+  $("gen").onclick = generar;
+  $("imp").onclick = () => $("importFile").click();
+  document.querySelectorAll("[data-open]").forEach(b => b.onclick = () => { actualId = b.dataset.open; guardar(); ir("resumen"); });
+  document.querySelectorAll("[data-del]").forEach(b => b.onclick = () => {
+    const x = packs.find(k => k.id === b.dataset.del);
+    if (!confirm(`¿Borrar «${x.titulo}» y su progreso?`)) return;
+    packs = packs.filter(k => k !== x); delete prog[x.id];
+    if (actualId === x.id) actualId = packs[0]?.id || null;
+    guardar(); vApuntes();
+  });
+  document.querySelectorAll("[data-exp]").forEach(b => b.onclick = () => exportar(packs.find(k => k.id === b.dataset.exp)));
 }
-$("tab-text").onclick = () => setMode("text");
-$("tab-file").onclick = () => setMode("file");
-$("pick").onclick = () => $("file").click();
 
 // Las fotos se reducen en el celular para que suban rápido
 function compressImage(file){
@@ -170,7 +294,7 @@ function compressImage(file){
       const max = 1600, s = Math.min(1, max / Math.max(img.width, img.height));
       const c = document.createElement("canvas"); c.width = Math.round(img.width*s); c.height = Math.round(img.height*s);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
-      resolve({ data: c.toDataURL("image/jpeg", 0.82).split(",")[1], mime: "image/jpeg" });
+      resolve({ data: c.toDataURL("image/jpeg", 0.82).split(",")[1], mime: "image/jpeg", name: file.name });
     };
     img.onerror = () => reject(new Error("No se pudo leer la imagen."));
     img.src = url;
@@ -179,101 +303,371 @@ function compressImage(file){
 function readBase64(file){
   return new Promise((resolve, reject) => {
     const r = new FileReader();
-    r.onload = () => resolve({ data: String(r.result).split(",")[1], mime: file.type });
+    r.onload = () => resolve({ data: String(r.result).split(",")[1], mime: file.type, name: file.name });
     r.onerror = () => reject(new Error("No se pudo leer el archivo."));
     r.readAsDataURL(file);
   });
 }
 $("file").onchange = async e => {
-  const f = e.target.files[0]; if (!f) return;
-  const st = $("status"); st.className = "status";
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  const st = $("status"); if (st) { st.className = "status"; st.textContent = ""; }
   try {
     if (f.type === "application/pdf") {
       if (f.size > 3*1024*1024) throw new Error("El PDF pesa más de 3 MB. Sube solo las páginas del tema.");
       fileData = await readBase64(f);
-    } else if (f.type.startsWith("image/")) {
-      fileData = await compressImage(f);
-    } else throw new Error("Ese tipo de archivo no se puede usar. Sube una foto o un PDF.");
-    $("fileName").textContent = f.name; $("fileName").hidden = false; st.textContent = "";
-  } catch(err){ fileData = null; $("fileName").hidden = true; st.className = "status err"; st.textContent = err.message; }
+    } else if (f.type.startsWith("image/")) fileData = await compressImage(f);
+    else throw new Error("Ese tipo de archivo no se puede usar. Sube una foto o un PDF.");
+    vApuntes();
+  } catch(err){ fileData = null; vApuntes(); toast(err.message); }
 };
 
-function esc(s){ const d=document.createElement("div"); d.textContent=String(s ?? ""); return d.innerHTML; }
-
-function render(){
-  const qs = current.preguntas, el = $("quiz");
-  if (idx >= qs.length) return renderEnd();
-  const q = qs[idx], answered = picked !== null;
-  el.innerHTML = `
-    <div class="meta"><span>${esc(current.titulo)}</span><span>${idx+1} / ${qs.length}</span></div>
-    <div class="bar"><i style="width:${Math.round(idx/qs.length*100)}%"></i></div>
-    ${q.tema?`<div><span class="meta"><span class="tag">${esc(q.tema)}</span></span></div>`:""}
-    <p class="q">${esc(q.pregunta)}</p>
-    <div class="opts">${q.opciones.map((o,i)=>{
-      let c="opt"; if(answered){ if(i===q.correcta)c+=" right"; else if(i===picked)c+=" wrong"; }
-      return `<button class="${c}" data-i="${i}" ${answered?"disabled":""}><b>${L[i]}</b><span>${esc(o)}</span></button>`;}).join("")}</div>
-    ${answered?`<p class="expl ${picked===q.correcta?"ok":"no"}"><strong>${picked===q.correcta?"Correcto":"Incorrecto · era la "+L[q.correcta]}</strong>${esc(q.explicacion)}</p>
-      <button class="primary wide" id="next">${idx+1<qs.length?"Siguiente":"Ver resultado"}</button>`:""}`;
-  el.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ picked=+b.dataset.i; answers[idx]=picked; render(); });
-  const n=$("next"); if(n) n.onclick=()=>{ idx++; picked=null; render(); el.scrollIntoView({block:"start"}); };
+async function llamar(body){
+  const r = await fetch("/api/generar", { method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ ...body, codigo: store.get("code", "") }) });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || "No se pudo generar. Revisa tu internet e intenta de nuevo.");
+  return data;
+}
+// Texto que se usa como fuente para pedir más preguntas sin volver a subir el archivo
+function fuenteDe(p){
+  if (p.fuente) return p.fuente;
+  return p.resumen.map(r => `## ${r.titulo}\n` + r.puntos.map(x => "- " + x.replace(/\*\*/g,"")).join("\n")).join("\n\n")
+    + "\n\n" + p.flashcards.map(c => `${c.frente}: ${c.reverso}`).join("\n");
 }
 
-function renderEnd(){
-  const qs = current.preguntas;
-  const ok = qs.filter((q,i)=>answers[i]===q.correcta).length;
-  const wrong = qs.filter((q,i)=>answers[i]!==q.correcta);
-  if (current.id) { const h = store.get("hist", []); const it = h.find(x=>x.id===current.id); if (it){ it.mejor = Math.max(it.mejor||0, ok); store.set("hist", h); renderHist(); } }
-  $("quiz").innerHTML = `
-    <div class="meta"><span>${esc(current.titulo)}</span><span>${Math.round(ok/qs.length*100)}%</span></div>
-    <div class="score">${ok}<span style="color:var(--muted);font-size:.5em">/${qs.length}</span></div>
-    ${wrong.length?`<h2>Para repasar</h2><ul class="list">${wrong.map(q=>`<li>${esc(q.pregunta)}<br><span class="r">${esc(q.opciones[q.correcta])}</span><br><span class="hint">${esc(q.explicacion)}</span></li>`).join("")}</ul>`:`<p class="hint">Todas correctas. Sube la dificultad o genera otro simulacro.</p>`}
-    <div class="actions"><button id="again">Repetir</button><button id="share">Compartir resultado</button></div>`;
-  $("again").onclick=()=>{ idx=0; picked=null; answers=[]; render(); };
-  $("share").onclick=async()=>{
-    const t = `Saqué ${ok}/${qs.length} en "${current.titulo}" con Simulacro Med 🩺 ${location.origin}`;
-    try { if (navigator.share) await navigator.share({ text: t }); else { await navigator.clipboard.writeText(t); $("share").textContent = "Copiado"; } } catch {}
-  };
+async function generar(){
+  const texto = mode==="text" ? $("notes").value.trim() : "";
+  if (mode==="text" && texto.length < 80) return toast("Pega un poco más de apuntes (al menos un párrafo).");
+  if (mode==="file" && !fileData) return toast("Primero elige una foto o PDF.");
+  const cfg = { n: $("count").value, tipo: $("style").value, nivel: $("level").value };
+  generando = true; vApuntes();
+  try {
+    const { estudio } = await llamar({ modo:"estudio", texto, archivo: mode==="file"?fileData.data:undefined, mime: mode==="file"?fileData.mime:undefined });
+    const p = { id: String(Date.now()), creado: Date.now(), ...estudio, quiz: [], cfg, fuente: texto.slice(0, 60000) };
+    packs.unshift(p); actualId = p.id; guardar();
+    generando = false; fileData = null; fc = null; qz = null; marcarDia();
+    ir("resumen");
+    pedirQuiz(p, cfg);
+  } catch(err){ generando = false; if (tab === "apuntes") { vApuntes(); toast(err.message); } else alert(err.message); }
 }
 
-function renderHist(){
-  const h = store.get("hist", []);
-  $("histPanel").hidden = !h.length;
-  $("hist").innerHTML = h.map(x=>`<button data-id="${x.id}"><span>${esc(x.titulo)}</span><span>${x.mejor!=null?x.mejor+"/"+x.preguntas.length:x.preguntas.length+" preg."}</span></button>`).join("");
-  $("hist").querySelectorAll("button").forEach(b=>b.onclick=()=>{
-    current = store.get("hist", []).find(x=>x.id===b.dataset.id); idx=0; picked=null; answers=[]; render();
-    $("quiz").scrollIntoView({behavior:"smooth", block:"start"});
+async function pedirQuiz(p, cfg){
+  pendienteQuiz.add(p.id); if (tab === "quiz") render();
+  try {
+    const { preguntas } = await llamar({ modo:"quiz", texto: fuenteDe(p), temas: p.temas, n: cfg.n, tipo: cfg.tipo, nivel: cfg.nivel,
+      hechas: p.quiz.map(q => q.pregunta) });
+    p.quiz.push(...preguntas); p.quizError = ""; guardar(); qz = null;
+  } catch(err){ p.quizError = err.message; }
+  pendienteQuiz.delete(p.id);
+  if (tab === "quiz" || tab === "apuntes") render();
+}
+
+function exportar(p){
+  const blob = new Blob([JSON.stringify({ simulacroMed: 2, materia: { ...p, fuente: undefined } })], { type:"application/json" });
+  const nombre = p.titulo.toLowerCase().normalize("NFD").replace(/[^\w]+/g,"-").replace(/^-|-$/g,"") + ".simulacro.json";
+  const file = new File([blob], nombre, { type:"application/json" });
+  if (navigator.canShare && navigator.canShare({ files:[file] })) navigator.share({ files:[file], title:p.titulo }).catch(()=>{});
+  else { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nombre; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000); }
+}
+$("importFile").onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text()); const m = d?.materia;
+    if (!m || !Array.isArray(m.temas) || !Array.isArray(m.resumen)) throw 0;
+    const p = { id:String(Date.now()), creado:Date.now(), titulo:String(m.titulo||"Materia"), temas:m.temas, resumen:m.resumen,
+      flashcards:m.flashcards||[], trampas:m.trampas||[], plan:m.plan||[], quiz:m.quiz||[], cfg:m.cfg||{n:15,tipo:"mixto",nivel:"intermedia"}, fuente:"" };
+    packs.unshift(p); actualId = p.id; fc = null; qz = null; guardar(); ir("resumen");
+  } catch { alert("Ese archivo no es una materia de Simulacro Med."); }
+};
+
+/* ================= PLAN DE HOY ================= */
+function vPlan(){
+  const p = pack(), pr = P();
+  if (pr.planDia !== hoy()) { pr.plan = {}; pr.planDia = hoy(); guardar(); }
+  const pendientes = p.flashcards.filter((c,i) => pr.cards[i] !== 2).length;
+  const debil = temasDebiles(p).find(t => t.dominio < 1);
+  const auto = [];
+  if (pendientes) auto.push({ k:"a1", tarea:`Pasa tus ${pendientes} flashcards pendientes`, minutos: Math.max(5, Math.round(pendientes/3)), ir:"flash" });
+  if (debil) auto.push({ k:"a2", tarea:`Quiz de tu tema más flojo: ${nombreTema(p, debil.id)}`, minutos:10, ir:"quiz", tema:debil.id });
+  if (p.trampas.length) auto.push({ k:"a3", tarea:"Lee las trampas antes de cerrar", minutos:5, ir:"trampas" });
+  const items = [...p.plan.map((x,i) => ({ ...x, k:"p"+i })), ...auto];
+  const total = items.reduce((s,x) => s + x.minutos, 0), hechos = items.filter(x => pr.plan[x.k]).length;
+  $("view").innerHTML = `
+  <section class="card">
+    <div class="row between"><h2>Plan de hoy</h2><span class="chip">${hechos}/${items.length} · ~${total} min</span></div>
+    <div class="bar"><i style="width:${items.length?Math.round(hechos/items.length*100):0}%"></i></div>
+    <div>${items.map(x => `<label class="check"><input type="checkbox" data-k="${x.k}" ${pr.plan[x.k]?"checked":""}>
+      <span class="${pr.plan[x.k]?"done":""}">${md(x.tarea)}</span><span class="m">${x.minutos} min</span>
+      ${x.ir?`<button class="small" data-ir="${x.ir}" data-tema="${x.tema||""}">Ir</button>`:""}</label>`).join("")}</div>
+    <button class="primary" id="goFoco">Empezar bloque de foco</button>
+  </section>`;
+  $("view").querySelectorAll("input[data-k]").forEach(c => c.onchange = () => { pr.plan[c.dataset.k] = c.checked; if (c.checked) marcarDia(); guardar(); vPlan(); });
+  $("view").querySelectorAll("[data-ir]").forEach(b => b.onclick = e => { e.preventDefault(); if (b.dataset.tema) qzTema = b.dataset.tema, qz = null; ir(b.dataset.ir); });
+  $("goFoco").onclick = () => ir("foco");
+}
+
+/* ================= FOCO ================= */
+const foco = store.get("sm.focoCfg", { trabajo:25, descanso:5 });
+let ft = { fase:"trabajo", fin:0, resta: foco.trabajo*60, corre:false, id:null };
+function vFoco(){
+  const min = store.get("sm.foco", {})[hoy()] || 0;
+  $("view").innerHTML = `
+  <section class="card">
+    <div class="row between"><h2>${ft.fase==="trabajo"?"Bloque de estudio":"Descanso"}</h2><span class="chip">Hoy: ${min} min</span></div>
+    <div class="timer" id="clock" role="timer" aria-live="off"></div>
+    <div class="row" style="justify-content:center">
+      <button class="primary" id="fPlay">${ft.corre?"Pausar":"Empezar"}</button>
+      <button id="fReset">Reiniciar</button>
+      <button id="fSkip">${ft.fase==="trabajo"?"Ir a descanso":"Volver a estudiar"}</button>
+    </div>
+    <div class="seg" role="group" aria-label="Duración">
+      ${[[25,5],[50,10],[15,3]].map(([a,b]) => `<button data-t="${a}" data-d="${b}" aria-selected="${foco.trabajo===a}">${a} / ${b}</button>`).join("")}
+    </div>
+    <p class="hint">Deja el celular boca abajo. Al terminar suena una alarma y los minutos se suman a tu progreso.</p>
+  </section>`;
+  pintarReloj();
+  $("fPlay").onclick = () => { ft.corre ? pausar() : arrancar(); vFoco(); };
+  $("fReset").onclick = () => { pausar(); ft.resta = (ft.fase==="trabajo"?foco.trabajo:foco.descanso)*60; vFoco(); };
+  $("fSkip").onclick = () => { pausar(); cambiarFase(); vFoco(); };
+  $("view").querySelectorAll("[data-t]").forEach(b => b.onclick = () => {
+    foco.trabajo = +b.dataset.t; foco.descanso = +b.dataset.d; store.set("sm.focoCfg", foco);
+    pausar(); ft.fase = "trabajo"; ft.resta = foco.trabajo*60; vFoco();
   });
 }
-
-$("gen").onclick = async () => {
-  const st = $("status"), btn = $("gen");
-  const texto = mode==="text" ? $("notes").value.trim() : "";
-  if (mode==="text" && texto.length < 80){ st.className="status err"; st.textContent="Pega un poco más de apuntes (al menos un párrafo)."; return; }
-  if (mode==="file" && !fileData){ st.className="status err"; st.textContent="Primero elige una foto o PDF."; return; }
-  btn.disabled = true; st.className="status"; st.innerHTML = `<span class="spinner"></span>Generando tu simulacro… unos 20-40 segundos`;
+function pintarReloj(){
+  const s = ft.corre ? Math.max(0, Math.round((ft.fin - Date.now())/1000)) : ft.resta;
+  const t = `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+  if ($("clock")) $("clock").textContent = t;
+  document.title = ft.corre ? `${t} · ${ft.fase==="trabajo"?"Estudiando":"Descanso"}` : "Simulacro Med";
+  return s;
+}
+function arrancar(){ ft.fin = Date.now() + ft.resta*1000; ft.corre = true; ft.id = setInterval(tick, 500); }
+function pausar(){ if (ft.corre) ft.resta = Math.max(0, Math.round((ft.fin - Date.now())/1000)); ft.corre = false; clearInterval(ft.id); pintarReloj(); }
+function tick(){
+  if (pintarReloj() > 0) return;
+  pausar();
+  if (ft.fase === "trabajo") { const f = store.get("sm.foco", {}); f[hoy()] = (f[hoy()]||0) + foco.trabajo; store.set("sm.foco", f); marcarDia(); }
+  alarma(); cambiarFase(); if (tab === "foco") vFoco();
+}
+function cambiarFase(){ ft.fase = ft.fase==="trabajo" ? "descanso" : "trabajo"; ft.resta = (ft.fase==="trabajo"?foco.trabajo:foco.descanso)*60; }
+function alarma(){
+  try { navigator.vibrate?.([300,150,300]); } catch {}
   try {
-    const r = await fetch("/api/generar", { method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ texto, archivo: mode==="file"?fileData.data:undefined, mime: mode==="file"?fileData.mime:undefined,
-        n: $("count").value, tipo: $("style").value, nivel: $("level").value, codigo: $("code").value }) });
-    const data = await r.json().catch(()=>({}));
-    if (!r.ok) throw new Error(data.error || "No se pudo generar. Revisa tu internet e intenta de nuevo.");
-    const tema = data.preguntas[0]?.tema || "Simulacro";
-    const fecha = new Date().toLocaleDateString("es", { day:"numeric", month:"short" });
-    current = { id: String(Date.now()), titulo: `${tema} · ${fecha}`, preguntas: data.preguntas };
-    const h = store.get("hist", []); h.unshift(current); store.set("hist", h.slice(0, 20)); renderHist();
-    idx=0; picked=null; answers=[]; st.textContent = `Listo: ${data.preguntas.length} preguntas.`;
-    render(); $("quiz").scrollIntoView({behavior:"smooth", block:"start"});
-  } catch(err){ st.className="status err"; st.textContent = err.message; }
-  finally { btn.disabled = false; }
-};
+    const ac = new (window.AudioContext||window.webkitAudioContext)();
+    [0,.35,.7].forEach(t => { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(.25, ac.currentTime+t); g.gain.exponentialRampToValueAtTime(.001, ac.currentTime+t+.3); o.start(ac.currentTime+t); o.stop(ac.currentTime+t+.3); });
+  } catch {}
+}
 
-// Instalar como app
+/* ================= RESUMEN ================= */
+let filtroRes = "";
+function vResumen(){
+  const p = pack();
+  if (!p.resumen.length) { $("view").innerHTML = `<section class="card"><h2>Resumen</h2><p class="muted">Esta materia vino de la versión anterior y solo tiene preguntas. Crea una nueva con tus apuntes para tener resumen y flashcards.</p></section>`; return; }
+  $("view").innerHTML = `
+  <section class="card">
+    <div class="row between"><h2>${esc(p.titulo)}</h2><button class="small" id="allBtn">Abrir todo</button></div>
+    <input type="search" id="buscar" placeholder="Buscar en el resumen…" value="${esc(filtroRes)}" aria-label="Buscar en el resumen">
+    <div id="secs"></div>
+    <p class="hint">Resumen hecho por IA a partir de tus apuntes. Revisa con tu libro o docente los datos que vayas a memorizar.</p>
+  </section>`;
+  const pintar = () => {
+    const q = filtroRes.toLowerCase();
+    const bloques = p.resumen.map(r => ({ ...r, puntos: q ? r.puntos.filter(x => x.toLowerCase().includes(q) || r.titulo.toLowerCase().includes(q)) : r.puntos })).filter(r => r.puntos.length);
+    $("secs").innerHTML = bloques.length ? bloques.map((r,i) => `<details class="sec" ${i===0||q?"open":""}><summary>${esc(r.titulo)}</summary>
+      <ul>${r.puntos.map(x => `<li>${md(x)}</li>`).join("")}</ul></details>`).join("") : `<p class="muted">No encontré «${esc(filtroRes)}».</p>`;
+  };
+  pintar();
+  $("buscar").oninput = e => { filtroRes = e.target.value; pintar(); };
+  $("allBtn").onclick = () => { const ds = $("secs").querySelectorAll("details"); const abrir = [...ds].some(d => !d.open); ds.forEach(d => d.open = abrir); $("allBtn").textContent = abrir ? "Cerrar todo" : "Abrir todo"; };
+  marcarDia();
+}
+
+/* ================= FLASHCARDS ================= */
+let fc = null; // { orden:[i], pos, vuelta, tema, soloPend }
+function vFlash(){
+  const p = pack(), pr = P();
+  if (!p.flashcards.length) { $("view").innerHTML = `<section class="card"><h2>Flashcards</h2><p class="muted">Esta materia no tiene flashcards. Crea una nueva con tus apuntes.</p></section>`; return; }
+  if (!fc) fc = { tema:"", soloPend:true, pos:0, vuelta:false, orden:null };
+  if (!fc.orden) {
+    fc.orden = p.flashcards.map((c,i) => i).filter(i => (!fc.tema || p.flashcards[i].tema === fc.tema) && (!fc.soloPend || pr.cards[i] !== 2));
+    fc.pos = 0; fc.vuelta = false;
+  }
+  const sabe = p.flashcards.filter((c,i) => pr.cards[i] === 2).length;
+  const i = fc.orden[fc.pos], c = p.flashcards[i];
+  $("view").innerHTML = `
+  <section class="card">
+    <div class="row between"><h2>Flashcards</h2><span class="chip">${sabe}/${p.flashcards.length} dominadas</span></div>
+    <div class="row">
+      <select id="fTema" style="flex:1;min-width:150px" aria-label="Tema"><option value="">Todos los temas</option>${p.temas.map(t => `<option value="${t.id}" ${fc.tema===t.id?"selected":""}>${esc(t.nombre)}</option>`).join("")}</select>
+      <label class="row" style="font-weight:400"><input type="checkbox" id="fPend" ${fc.soloPend?"checked":""}> Solo pendientes</label>
+    </div>
+    ${c ? `
+    <div class="meta"><span>${esc(nombreTema(p, c.tema))}</span><span>${fc.pos+1} / ${fc.orden.length}</span></div>
+    <button class="flash ${fc.vuelta?"back":""}" id="card" aria-label="${fc.vuelta?"Respuesta":"Pregunta"}. Toca para voltear">
+      ${fc.vuelta ? `<span>${md(c.reverso)}</span>` : `<span>${md(c.frente)}</span><span class="hint">Toca para ver la respuesta</span>`}
+    </button>
+    <div class="row">
+      <button class="bad" id="fNo" style="flex:1">Repasar</button>
+      <button class="ok" id="fSi" style="flex:1">La sé</button>
+    </div>
+    <div class="row between"><button class="small" id="fPrev" ${fc.pos?"":"disabled"}>← Anterior</button>
+      <button class="small" id="fMix">Mezclar</button>
+      <button class="small" id="fNext" ${fc.pos+1<fc.orden.length?"":"disabled"}>Siguiente →</button></div>`
+    : `<div class="empty card" style="border:0"><h3>¡Terminaste este mazo! 🎉</h3><p class="muted">Ya marcaste todas como dominadas${fc.tema?" en este tema":""}.</p>
+      <button id="fReset">Volver a pasar todas</button></div>`}
+  </section>`;
+  $("fTema").onchange = e => { fc.tema = e.target.value; fc.orden = null; vFlash(); };
+  $("fPend").onchange = e => { fc.soloPend = e.target.checked; fc.orden = null; vFlash(); };
+  if (!c) { $("fReset").onclick = () => { fc.soloPend = false; fc.orden = null; vFlash(); }; return; }
+  const sig = () => { if (fc.pos+1 < fc.orden.length) { fc.pos++; fc.vuelta = false; } else if (fc.soloPend) { fc.orden = null; } else { fc.pos = 0; fc.vuelta = false; } vFlash(); };
+  $("card").onclick = () => { fc.vuelta = !fc.vuelta; vFlash(); };
+  $("fSi").onclick = () => { pr.cards[i] = 2; guardar(); marcarDia(); sig(); };
+  $("fNo").onclick = () => { pr.cards[i] = 1; guardar(); marcarDia(); sig(); };
+  $("fPrev").onclick = () => { fc.pos--; fc.vuelta = false; vFlash(); };
+  $("fNext").onclick = () => { fc.pos++; fc.vuelta = false; vFlash(); };
+  $("fMix").onclick = () => { fc.orden = shuffle(fc.orden); fc.pos = 0; fc.vuelta = false; vFlash(); };
+}
+
+/* ================= QUIZ ================= */
+let qz = null, qzTema = "", qzModo = "nuevas";
+function vQuiz(){
+  const p = pack(), pr = P();
+  const cargando = pendienteQuiz.has(p.id);
+  if (!qz) {
+    let lista = p.quiz.map((q,i) => i).filter(i => !qzTema || p.quiz[i].tema === qzTema);
+    if (qzModo === "nuevas") lista = lista.filter(i => !pr.qs[i]);
+    if (qzModo === "falladas") lista = lista.filter(i => pr.qs[i] && !pr.qs[i].ok);
+    qz = { lista: qzModo==="todas" ? lista : shuffle(lista), pos:0, pick:null, res:[] };
+  }
+  const cab = `
+    <div class="row between"><h2>Quiz</h2><span class="chip">${p.quiz.length} preguntas</span></div>
+    <div class="row">
+      <select id="qTema" style="flex:1;min-width:150px" aria-label="Tema"><option value="">Todos los temas</option>${p.temas.map(t => `<option value="${t.id}" ${qzTema===t.id?"selected":""}>${esc(t.nombre)}</option>`).join("")}</select>
+      <select id="qModo" style="flex:1;min-width:140px" aria-label="Qué preguntas">
+        <option value="nuevas" ${qzModo==="nuevas"?"selected":""}>Sin responder</option>
+        <option value="falladas" ${qzModo==="falladas"?"selected":""}>Solo falladas</option>
+        <option value="todas" ${qzModo==="todas"?"selected":""}>Todas</option></select>
+    </div>`;
+  const mas = `
+    <div class="row"><button class="primary" id="qMas" ${cargando?"disabled":""} style="flex:1">${cargando?'<span class="spinner"></span>Generando preguntas…':"Generar 10 preguntas más"}</button></div>
+    ${p.quizError && !cargando ? `<p class="status err">${esc(p.quizError)}</p>` : ""}`;
+  const q = p.quiz[qz.lista[qz.pos]];
+  let cuerpo;
+  if (!p.quiz.length && cargando) cuerpo = `<p class="status"><span class="spinner"></span>Preparando tus preguntas tipo examen… unos 30 segundos. Mientras, lee el resumen.</p>`;
+  else if (!p.quiz.length) cuerpo = `<p class="muted">Esta materia todavía no tiene preguntas.</p>${mas}`;
+  else if (!qz.lista.length) cuerpo = `<p class="muted">${qzModo==="falladas"?"No tienes preguntas falladas aquí. 💪":qzModo==="nuevas"?"Ya respondiste todas las preguntas de este filtro.":"No hay preguntas en este tema."}</p>${mas}`;
+  else if (!q) cuerpo = finQuiz(p) + mas;
+  else {
+    const answered = qz.pick !== null;
+    cuerpo = `
+    <div class="meta"><span>${esc(nombreTema(p, q.tema) || q.tema)}</span><span>${qz.pos+1} / ${qz.lista.length}</span></div>
+    <div class="bar"><i style="width:${Math.round(qz.pos/qz.lista.length*100)}%"></i></div>
+    <p class="q">${md(q.pregunta)}</p>
+    <div class="opts">${q.opciones.map((o,i) => {
+      let c = "opt"; if (answered) { if (i===q.correcta) c += " right"; else if (i===qz.pick) c += " wrong"; }
+      return `<button class="${c}" data-i="${i}" ${answered?"disabled":""}><b>${L[i]}</b><span>${md(o)}</span></button>`; }).join("")}</div>
+    ${answered ? `<p class="expl ${qz.pick===q.correcta?"ok":"no"}"><strong>${qz.pick===q.correcta?"Correcto":"Incorrecto · era la "+L[q.correcta]}</strong>${md(q.explicacion)}</p>
+      <button class="primary wide" id="next">${qz.pos+1<qz.lista.length?"Siguiente":"Ver resultado"}</button>` : ""}`;
+  }
+  $("view").innerHTML = `<section class="card" id="qcard">${cab}${cuerpo}</section>`;
+  $("qTema").onchange = e => { qzTema = e.target.value; qz = null; vQuiz(); };
+  $("qModo").onchange = e => { qzModo = e.target.value; qz = null; vQuiz(); };
+  if ($("qMas")) $("qMas").onclick = () => { qz = null; pedirQuiz(p, { ...(p.cfg||{}), n:10 }); };
+  $("view").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const idx = qz.lista[qz.pos]; qz.pick = +b.dataset.i;
+    const ok = qz.pick === q.correcta; qz.res.push(ok);
+    const r = pr.qs[idx] || { ok:false, n:0 }; pr.qs[idx] = { ok, n: r.n+1 }; guardar(); marcarDia(); vQuiz();
+  });
+  if ($("next")) $("next").onclick = () => { qz.pos++; qz.pick = null; vQuiz(); $("qcard").scrollIntoView({block:"start"}); };
+  if ($("again")) $("again").onclick = () => { qz = null; vQuiz(); };
+  if ($("share")) $("share").onclick = async () => {
+    const ok = qz.res.filter(Boolean).length;
+    const t = `Saqué ${ok}/${qz.res.length} en "${p.titulo}" con Simulacro Med 🩺 ${location.origin}`;
+    try { if (navigator.share) await navigator.share({ text:t }); else { await navigator.clipboard.writeText(t); $("share").textContent = "Copiado"; } } catch {}
+  };
+}
+function finQuiz(p){
+  const ok = qz.res.filter(Boolean).length, n = qz.res.length;
+  const malas = qz.lista.filter((x,i) => !qz.res[i]).map(i => p.quiz[i]);
+  return `<div class="meta"><span>Resultado</span><span>${n?Math.round(ok/n*100):0}%</span></div>
+    <div class="score">${ok}<span style="color:var(--muted);font-size:.5em">/${n}</span></div>
+    ${malas.length ? `<h3>Para repasar</h3><ul class="list">${malas.map(q => `<li>${md(q.pregunta)}<br><span class="r">${md(q.opciones[q.correcta])}</span><br><span class="hint">${md(q.explicacion)}</span></li>`).join("")}</ul>` : `<p class="muted">Todas correctas. Prueba con «Generar más» o sube la dificultad.</p>`}
+    <div class="row between"><button id="again">Otra ronda</button><button id="share">Compartir resultado</button></div>`;
+}
+
+/* ================= PROGRESO ================= */
+function temasDebiles(p){
+  const pr = prog[p.id] || { cards:{}, qs:{} };
+  return p.temas.map(t => {
+    const cs = p.flashcards.map((c,i) => [c,i]).filter(([c]) => c.tema === t.id);
+    const qs = p.quiz.map((q,i) => [q,i]).filter(([q]) => q.tema === t.id);
+    const resp = qs.filter(([,i]) => pr.qs[i]);
+    const pc = cs.length ? cs.filter(([,i]) => pr.cards[i] === 2).length / cs.length : null;
+    const pq = resp.length ? resp.filter(([,i]) => pr.qs[i].ok).length / resp.length : null;
+    const partes = [pc, pq].filter(v => v !== null);
+    return { id:t.id, nombre:t.nombre, pc, pq, nq:resp.length, dominio: partes.length ? partes.reduce((a,b)=>a+b,0)/partes.length : 0 };
+  }).sort((a,b) => a.dominio - b.dominio);
+}
+function vProgreso(){
+  const p = pack(), pr = P();
+  const sabe = p.flashcards.filter((c,i) => pr.cards[i] === 2).length;
+  const resp = Object.keys(pr.qs).filter(i => p.quiz[i]);
+  const acierto = resp.length ? Math.round(resp.filter(i => pr.qs[i].ok).length / resp.length * 100) : 0;
+  const f = store.get("sm.foco", {});
+  const dias = [...Array(7)].map((_,k) => { const d = new Date(); d.setDate(d.getDate()-6+k); const key = d.toLocaleDateString("en-CA"); return { l: d.toLocaleDateString("es",{weekday:"narrow"}), m: f[key]||0 }; });
+  const maxM = Math.max(25, ...dias.map(d => d.m));
+  const temas = temasDebiles(p);
+  $("view").innerHTML = `
+  <section class="card">
+    <h2>Progreso · ${esc(p.titulo)}</h2>
+    <div class="stat">
+      <div><b>${p.flashcards.length?Math.round(sabe/p.flashcards.length*100):0}%</b><span>flashcards dominadas</span></div>
+      <div><b>${acierto}%</b><span>aciertos (${resp.length} resp.)</span></div>
+      <div><b>${racha()}</b><span>días de racha</span></div>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Dominio por tema</h2>
+    ${temas.slice().sort((a,b) => p.temas.findIndex(t=>t.id===a.id) - p.temas.findIndex(t=>t.id===b.id)).map(t => `<div class="topic">
+      <div class="meta"><span style="color:var(--ink);font-family:var(--body);font-size:14px">${esc(t.nombre)}</span><span>${Math.round(t.dominio*100)}%</span></div>
+      <div class="bar"><i style="width:${Math.round(t.dominio*100)}%"></i></div>
+      <span class="hint">${t.pc!==null?`Tarjetas ${Math.round(t.pc*100)}%`:"Sin tarjetas"} · ${t.pq!==null?`Quiz ${Math.round(t.pq*100)}% (${t.nq})`:"Quiz sin hacer"}</span></div>`).join("")}
+    ${temas[0] && temas[0].dominio < 1 ? `<p class="hint">Tu tema más flojo ahora: <b>${esc(temas[0].nombre)}</b>.</p>` : ""}
+  </section>
+  <section class="card">
+    <div class="row between"><h2>Minutos de foco · 7 días</h2><span class="chip">${dias.reduce((s,d)=>s+d.m,0)} min</span></div>
+    <div class="week" role="img" aria-label="Minutos de foco por día en la última semana">${dias.map(d => `<div><span>${d.m||""}</span><i style="height:${Math.round(d.m/maxM*60)}px"></i><span>${d.l}</span></div>`).join("")}</div>
+  </section>
+  <section class="card"><div class="row between"><p class="muted">¿Quieres empezar de cero esta materia?</p><button class="small bad" id="resetP">Reiniciar progreso</button></div></section>`;
+  $("resetP").onclick = () => { if (confirm("Se borran tus marcas de flashcards y respuestas de esta materia.")) { prog[p.id] = { cards:{}, qs:{}, plan:{}, planDia:"" }; guardar(); fc = null; qz = null; vProgreso(); } };
+}
+
+/* ================= TRAMPAS ================= */
+function vTrampas(){
+  const p = pack();
+  $("view").innerHTML = `
+  <section class="card">
+    <h2>Trampas de examen</h2>
+    <p class="hint">Las confusiones que más hacen fallar. Léelas justo antes del examen.</p>
+    ${p.trampas.length ? p.trampas.map(t => `<div class="trap"><b>${md(t.confusion)}</b><span>${md(t.clave)}</span><span class="hint">${esc(nombreTema(p, t.tema))}</span></div>`).join("")
+      : `<p class="muted">Esta materia no tiene trampas. Crea una nueva con tus apuntes.</p>`}
+  </section>`;
+}
+
+/* ================= TEMA E INSTALACIÓN ================= */
+const tema0 = store.get("theme", null); if (tema0) document.documentElement.setAttribute("data-theme", tema0);
+$("themeBtn").onclick = () => {
+  const actual = document.documentElement.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const n = actual === "dark" ? "light" : "dark"; document.documentElement.setAttribute("data-theme", n); store.set("theme", n);
+};
 let deferred = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; $("install").hidden = false; });
 $("install").onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $("install").hidden = true; };
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(()=>{});
 
-render(); renderHist();
+if (pack()) tab = "plan"; else if (packs.length) { actualId = packs[0].id; tab = "plan"; }
+pintarNav(); pintarRacha(); render();
 </script>
 </body>
 </html>

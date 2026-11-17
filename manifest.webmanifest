@@ -1,7 +1,7 @@
 {
   "name": "Simulacro Med",
   "short_name": "Simulacro",
-  "description": "Sube tus apuntes y practica con preguntas tipo examen de medicina.",
+  "description": "Sube tus apuntes y la app te arma resumen, flashcards, quiz, trampas y plan de estudio.",
   "lang": "es",
   "start_url": "/",
   "display": "standalone",
